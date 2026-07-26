@@ -5,39 +5,79 @@ version: 1.0.0
 author: community
 license: MIT
 platforms: [linux, macos, windows]
-tags: [general]
+metadata:
+  hermes:
+    tags: [Audio, Visualization, Spectrogram, Music, Analysis]
+    homepage: https://github.com/steipete/songsee
+prerequisites:
+  commands: [songsee]
 ---
 
-# Songsee — Skill
+# songsee
 
-Audio spectrograms/features (mel, chroma, MFCC) via CLI.
+Generate spectrograms and multi-panel audio feature visualizations from audio files.
 
-## Install
+## Prerequisites
 
+Requires [Go](https://go.dev/doc/install):
 ```bash
-cp -r <skill-name> ~/.hermes/skills/<skill-path>/
+go install github.com/steipete/songsee/cmd/songsee@latest
 ```
 
-Or clone this repository:
+Optional: `ffmpeg` for formats beyond WAV/MP3.
+
+## Quick Start
 
 ```bash
-git clone https://github.com/iizcm/songsee-skill.git ~/.hermes/skills/<skill-path>/
+# Basic spectrogram
+songsee track.mp3
+
+# Save to specific file
+songsee track.mp3 -o spectrogram.png
+
+# Multi-panel visualization grid
+songsee track.mp3 --viz spectrogram,mel,chroma,hpss,selfsim,loudness,tempogram,mfcc,flux
+
+# Time slice (start at 12.5s, 8s duration)
+songsee track.mp3 --start 12.5 --duration 8 -o slice.jpg
+
+# From stdin
+cat track.mp3 | songsee - --format png -o out.png
 ```
 
-## Usage
+## Visualization Types
 
-Invoke your AI agent with a clear instruction matching this skill's purpose. The agent will route tasks to this skill when the instruction matches its description or trigger keywords.
+Use `--viz` with comma-separated values:
 
-Refer to `README.md` in this repository for:
-- Detailed step-by-step installation guide
-- Bilingual documentation (English + Indonesian)
-- Troubleshooting table
-- Security best practices
-- Customization tips
+| Type | Description |
+|------|-------------|
+| `spectrogram` | Standard frequency spectrogram |
+| `mel` | Mel-scaled spectrogram |
+| `chroma` | Pitch class distribution |
+| `hpss` | Harmonic/percussive separation |
+| `selfsim` | Self-similarity matrix |
+| `loudness` | Loudness over time |
+| `tempogram` | Tempo estimation |
+| `mfcc` | Mel-frequency cepstral coefficients |
+| `flux` | Spectral flux (onset detection) |
 
-## Safety rules
+Multiple `--viz` types render as a grid in a single image.
 
-- Never commit private keys, seed phrases, API tokens, or personal data to version control
-- Use placeholders (`<YOUR_...>`) in all examples and code snippets
-- Validate all outputs before acting on them
-- Keep real credentials in your runtime's secure credential store only
+## Common Flags
+
+| Flag | Description |
+|------|-------------|
+| `--viz` | Visualization types (comma-separated) |
+| `--style` | Color palette: `classic`, `magma`, `inferno`, `viridis`, `gray` |
+| `--width` / `--height` | Output image dimensions |
+| `--window` / `--hop` | FFT window and hop size |
+| `--min-freq` / `--max-freq` | Frequency range filter |
+| `--start` / `--duration` | Time slice of the audio |
+| `--format` | Output format: `jpg` or `png` |
+| `-o` | Output file path |
+
+## Notes
+
+- WAV and MP3 are decoded natively; other formats require `ffmpeg`
+- Output images can be inspected with `vision_analyze` for automated audio analysis
+- Useful for comparing audio outputs, debugging synthesis, or documenting audio processing pipelines
